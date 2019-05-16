@@ -1,0 +1,27 @@
+---
+- name: Setup ufw
+  ufw: state=enabled policy=deny direction=incoming
+
+- name: Allow ssh traffic
+  ufw: rule=allow port={{ custom_ssh_port }} proto=tcp direction=in
+
+- name: Allow https traffic
+  ufw: rule=allow port=443 proto=tcp direction=in
+
+- name: Disallow password authentication
+  lineinfile: dest=/etc/ssh/sshd_config
+              regexp="^PasswordAuthentication"
+              line="PasswordAuthentication no"
+              state=present
+  notify: Restart ssh
+
+- name: Disallow root SSH access
+  lineinfile: dest=/etc/ssh/sshd_config
+              regexp="^PermitRootLogin"
+              line="PermitRootLogin no"
+              state=present
+  notify: Restart ssh
+
+- name: Change default SSh port
+   include_tasks: "default-ssh-port-change.yml"
+   when: not skip_default_ssh_port_change

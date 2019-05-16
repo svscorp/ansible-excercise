@@ -1,0 +1,3 @@
+---
+users: ['ansible']  # override if you want
+custom_ssh_port: 22 # override if you want

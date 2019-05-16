@@ -1,0 +1,17 @@
+---
+users: ['ansible']
+custom_ssh_port: 22
+skip_default_ssh_port_change: True
+
+ubuntu_common_required_packages:
+  - ufw
+  - fail2ban
+  - unattended-upgrades
+  - logwatch
+  - python3-pip
+  - python3-setuptools
+
+ubuntu_common_optional_packages:
+  - vim
+  - htop
+  - git

@@ -1,0 +1,38 @@
+---
+- name: Make sure SUDO group is present
+  group:
+    name: wheel
+    state: present
+
+- name: Add userd to sudoers
+  lineinfile:
+    dest: /etc/sudoers
+    state: present
+    regexp: '^%wheel'
+    line: '%wheel ALL=(ALL) NOPASSWD: ALL'
+    validate: 'visudo -cf %s'
+
+- name: Create users and add them to groups
+  user:
+    name: "{{ item }}"
+    state: present
+    groups: wheel
+    append: yes
+    shell: /bin/bash
+    createhome: yes
+  with_items: "{{ users }}"
+
+- name: Make .ssh directories
+  file:
+    name: "/home/{{ item }}/.ssh"
+    state: directory
+    owner: "{{ item }}"
+    group: "{{ item }}"
+  with_items: "{{ users }}"
+
+- name: Place users' public_keys into their own user's authorized keys
+  authorized_key:
+    user: "{{ item }}"
+    key: "{{ lookup('file', 'keys/{{ item }}_rsa.pub') }}"
+    exclusive: True
+  with_items: "{{ users }}"
